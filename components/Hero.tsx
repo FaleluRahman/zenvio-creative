@@ -1,10 +1,8 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { useEffect, useState, useRef, useMemo, useId, } from "react";
-
-
-
+import { useEffect, useState, useRef, useMemo, useId } from "react";
+import BlurText from "./reactbits/motion";
 
 /* ── TextType Component ── */
 type TextTypeProps = {
@@ -285,10 +283,35 @@ export default function Hero() {
     return () => clearInterval(interval);
   }, []);
 
+  /* ── Rotating headlines ── */
+  const headlines = [
+    {
+      line1: { text: "Make Noise.", gradient: false },
+      line2: { text: "Make History.", gradient: "Make" },
+    },
+    {
+      line1: { text: "Think Sharp.", gradient: false },
+      line2: { text: "Grow Faster.", gradient: "Grow" },
+    },
+    {
+      line1: { text: "Attention", gradient: false },
+      line2: { text: "Into Impact.", gradient: "Impact." },
+    },
+  ];
+  const [headlineIndex, setHeadlineIndex] = useState(0);
+  const [headlineKey, setHeadlineKey] = useState(0);
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      setHeadlineIndex((i) => (i + 1) % headlines.length);
+      setHeadlineKey((k) => k + 1);
+    }, 3800);
+    return () => clearInterval(t);
+  }, []);
+
   /* ── Theme tokens ── */
   const bg           = dark ? "#0a0a0a"                : "#f0ecfa";
   const textPrimary  = dark ? "#ffffff"                : "#0e0520";
-  // ── FIX: p tag color — white in dark, dark in light ──
   const textMuted    = dark ? "rgba(255, 255, 255, 0.75)" : "rgba(14, 5, 32, 0.70)";
   const cardBorder   = dark ? "rgba(128,39,224,0.20)"  : "rgba(109,31,212,0.18)";
   const cardActiveBdr= dark ? "rgba(142,53,240,0.60)"  : "rgba(109,31,212,0.50)";
@@ -297,8 +320,14 @@ export default function Hero() {
     : "0 16px 56px rgba(109,31,212,0.22), 0 4px 16px rgba(109,31,212,0.14)";
   const glowOp1      = dark ? 0.08  : 0.20;
   const glowOp2      = dark ? 0.06  : 0.14;
-  const dotInactive  = dark ? "rgba(128,39,224,0.25)" : "rgba(109,31,212,0.22)";
   const marqueeColor = dark ? "rgba(255,255,255,0.38)" : "rgba(14,5,32,0.40)";
+
+  const gradientSpanStyle: React.CSSProperties = {
+    background: "linear-gradient(90deg, #3b0f8a, #6d1fd4, #8e35f0)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    backgroundClip: "text",
+  };
 
   return (
     <section
@@ -324,58 +353,190 @@ export default function Hero() {
       />
 
       {/* ════════════ LEFT ════════════ */}
-      {/*
-        FIX: Increased mobile top padding significantly — pt-36 on mobile (max-md)
-        Previously was max-md:pt-20, now max-md:pt-36 for much more breathing room
-      */}
       <div className="flex flex-col justify-center z-10 flex-[0_0_55%] px-20 pt-24 pb-16 max-lg:flex-[0_0_auto] max-lg:px-12 max-lg:pt-24 max-md:px-6 max-md:pt-24 max-md:mt-8 box-border">
 
-        {/* Headline */}
+        {/* ── H1: Rotating BlurText headlines ── */}
         <h1
-          className="font-medium leading-[1.02] tracking-[-0.02em] mb-6 max-w-[960px]"
+          className="font-medium leading-[1.08] tracking-[-0.02em] mb-6 max-w-[960px]"
           style={{
             fontFamily: "var(--font-clash)",
             fontSize: "clamp(42px, 6.5vw, 96px)",
             color: textPrimary,
           }}
         >
-          Your {""}
-          <span className="inline-block bg-gradient-to-r from-[#3b0f8a] via-[#6d1fd4] to-[#8e35f0] bg-clip-text text-transparent">
-            Brand {""}
+          <span key={headlineKey} className="flex flex-col">
+            {/* Line 1 — always plain */}
+            <span className="inline-flex flex-wrap">
+              <BlurText
+                text={headlines[headlineIndex].line1.text}
+                delay={100}
+                animateBy="words"
+                direction="top"
+                className="inline"
+              />
+            </span>
+
+            {/* Line 2 — gradient word via spanStyle */}
+            <span className="inline-flex flex-wrap items-baseline whitespace-nowrap">
+              {headlines[headlineIndex].line2.gradient ? (
+                <>
+                  {headlines[headlineIndex].line2.text
+                    .split(" ")
+                    .map((word, wi) => {
+                      const isGradient =
+                        word.replace(/[^a-zA-Z]/g, "") ===
+                        (headlines[headlineIndex].line2.gradient as string).replace(/[^a-zA-Z]/g, "");
+                      return (
+                        <BlurText
+                          key={wi}
+                          text={wi === 0 ? word : " " + word}
+                          delay={260 + wi * 80}
+                          animateBy="words"
+                          direction="top"
+                          className="inline"
+                          spanStyle={isGradient ? gradientSpanStyle : undefined}
+                        />
+                      );
+                    })}
+                </>
+              ) : (
+                <BlurText
+                  text={headlines[headlineIndex].line2.text}
+                  delay={260}
+                  animateBy="words"
+                  direction="top"
+                  className="inline"
+                />
+              )}
+            </span>
           </span>
-          {""} is {""}
-          <span
-            className="inline-block text-white"
-            style={{
-              background: "linear-gradient(90deg, #4a0fa8 0%, #7c22e8 100%)",
-              padding: "2px 14px 6px 6px",
-            }}
-          >
-            Bleeding.
-          </span>
-          <br />
-          <TextType
-            texts={["Let's Stop it.", "Let's Fix it.", "Let's Own it."]}
-            typingSpeed={65}
-            deletingSpeed={40}
-            pauseDuration={1800}
-            showCursor
-            cursorCharacter="_"
-            cursorBlinkDuration={0.5}
-          />
         </h1>
 
-        {/* Body copy — FIX: white in dark theme, dark in light theme */}
-        <p
-          className="text-[17px] leading-[1.78] max-w-[500px] mb-7"
-          style={{
-            color: textMuted,
-            fontFamily: "system-ui, -apple-system, sans-serif",
-          }}
-        >
-          We don&apos;t just run campaigns. We build brands that are impossible to scroll past,
-          impossible to forget, and impossible to compete with.
-        </p>
+      {/* ── P tag: TextType (typing animation) ── */}
+<p
+  className="text-[17px] leading-[1.2] max-w-125 mb-7"
+  style={{
+    fontFamily: "system-ui, -apple-system, sans-serif",
+    minHeight: "2.4em",
+    background: "linear-gradient(90deg, #580ca5, #8027e0)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    backgroundClip: "text",
+  }}
+>
+  <TextType
+    texts={[
+      "We don't just run campaigns. We build brands that are impossible to scroll past.",
+      "Impossible to forget, and impossible to compete with.",
+      "Data-first creative. Stories engineered to spread.",
+    ]}
+    typingSpeed={38}
+    deletingSpeed={22}
+    pauseDuration={2200}
+    showCursor
+    cursorCharacter="|"
+    cursorBlinkDuration={0.5}
+  />
+</p>
+        {/* ── CTA Buttons ── */}
+        <div className="flex gap-4 flex-wrap">
+          {/* Primary: What We Do */}
+          <a
+            href="#services"
+            className="group relative inline-flex items-center gap-2 font-semibold tracking-wide transition-all duration-300"
+            style={{
+              fontFamily: "var(--font-clash)",
+              fontSize: "clamp(13px, 1.4vw, 15px)",
+              padding: "13px 28px",
+              background: "linear-gradient(90deg, #4a0fa8 0%, #7c22e8 100%)",
+              color: "#ffffff",
+              borderRadius: "6px",
+              boxShadow: dark
+                ? "0 0 0 0 rgba(128,39,224,0)"
+                : "0 4px 20px rgba(109,31,212,0.35)",
+              textDecoration: "none",
+              letterSpacing: "0.06em",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.boxShadow =
+                "0 6px 28px rgba(128,39,224,0.55)";
+              (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(-2px)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.boxShadow = dark
+                ? "0 0 0 0 rgba(128,39,224,0)"
+                : "0 4px 20px rgba(109,31,212,0.35)";
+              (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(0)";
+            }}
+          >
+            What We Do
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 15 15"
+              fill="none"
+              style={{ transition: "transform 0.3s ease" }}
+              className="group-hover:translate-x-1"
+            >
+              <path
+                d="M3 7.5h9M8.5 4l3.5 3.5L8.5 11"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </a>
+
+          {/* Secondary: Let's Connect */}
+          <a
+            href="#contact"
+            className="inline-flex items-center gap-2 font-semibold tracking-wide transition-all duration-300"
+            style={{
+              fontFamily: "var(--font-clash)",
+              fontSize: "clamp(13px, 1.4vw, 15px)",
+              padding: "12px 28px",
+              background: "transparent",
+              color: dark ? "rgba(200,170,255,0.9)" : "#4a0fa8",
+              border: `1.5px solid ${dark ? "rgba(142,53,240,0.45)" : "rgba(109,31,212,0.40)"}`,
+              borderRadius: "6px",
+              textDecoration: "none",
+              letterSpacing: "0.06em",
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.borderColor = dark
+                ? "rgba(142,53,240,0.85)"
+                : "rgba(109,31,212,0.80)";
+              (e.currentTarget as HTMLAnchorElement).style.background = dark
+                ? "rgba(128,39,224,0.10)"
+                : "rgba(109,31,212,0.06)";
+              (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(-2px)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLAnchorElement).style.borderColor = dark
+                ? "rgba(142,53,240,0.45)"
+                : "rgba(109,31,212,0.40)";
+              (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
+              (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(0)";
+            }}
+          >
+            Let&apos;s Connect
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              fill="none"
+            >
+              <path
+                d="M2 7c0-2.76 2.24-5 5-5s5 2.24 5 5-2.24 5-5 5S2 9.76 2 7zm5-2v4m-2-2h4"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </a>
+        </div>
       </div>
 
       {/* ════════════ RIGHT — Cards ════════════ */}
@@ -500,10 +661,9 @@ export default function Hero() {
             );
           })}
         </div>
-
-      
       </div>
 
+      {/* ── Marquee ── */}
       <div className="absolute bottom-0 left-0 right-0 w-full z-20">
         <div className="pb-5 pt-1">
           <CurvedLoop

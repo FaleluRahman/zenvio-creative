@@ -50,11 +50,11 @@ export default function Navbar() {
         >
           <a
             href="#"
-            className="text-md font-bold tracking-tight select-none"
-            style={{ fontFamily: "var(--font-clash)" }}
+            className="text-xl font-bold tracking-tight select-none"
+            style={{ fontFamily: "var(--font-vamos)" }}
           >
             <span className="bg-clip-text text-transparent bg-linear-to-r from-brand-mid to-brand-light">
-              Zenivo
+              Zenivo 
             </span>
           </a>
 
