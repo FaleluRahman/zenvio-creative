@@ -44,38 +44,39 @@ export default function Navbar() {
         <nav
           className={`flex items-center justify-between transition-all duration-500 ease-in-out ${
             scrolled
-              ? "w-[90%] max-w-4xl px-8 py-3 rounded-full border border-white/10 shadow-2xl backdrop-blur-xl bg-black/40"
+              ? "w-[90%] max-w-4xl px-8 py-3 rounded-full border border-purple-900/15 dark:border-white/15 shadow-xl backdrop-blur-xl bg-white/85 dark:bg-black/70"
               : "w-full h-24 px-6 md:px-12 bg-transparent border-none"
           }`}
         >
           <a
             href="#"
-            className="text-xl font-bold tracking-tight select-none"
+            className="text-xl font-bold tracking-tight select-none flex items-center"
             style={{ fontFamily: "var(--font-vamos)" }}
           >
-            <span className="bg-clip-text text-transparent bg-linear-to-r from-brand-mid to-brand-light">
-              Zenivo 
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-700 via-purple-600 to-purple-400 font-extrabold">
+              Zenvio
             </span>
+         
           </a>
 
           {/* Desktop nav */}
-          <ul className="hidden md:flex items-center gap-10">
+          <ul className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
               <li key={link.href} className="flex items-center gap-2 group">
                 <span
-                  className={`w-1.5 h-1.5 rounded-full bg-[#8027e0] transition-opacity ${
+                  className={`w-1.5 h-1.5 rounded-full bg-purple-600 transition-opacity ${
                     active === link.label
                       ? "opacity-100"
-                      : "opacity-0 group-hover:opacity-50"
+                      : "opacity-0 group-hover:opacity-60"
                   }`}
                 />
                 <a
                   href={link.href}
                   onClick={() => setActive(link.label)}
-                  className={`text-sm font-medium transition-colors ${
+                  className={`text-sm font-semibold transition-colors ${
                     active === link.label
-                      ? "text-black dark:text-white"
-                      : "text-gray-500 hover:text-black dark:hover:text-white"
+                      ? "text-purple-700 dark:text-purple-400 font-bold"
+                      : "text-gray-700 dark:text-gray-200 hover:text-purple-700 dark:hover:text-white"
                   }`}
                   style={{ fontFamily: "var(--font-clash)" }}
                 >
@@ -89,7 +90,7 @@ export default function Navbar() {
             {mounted && (
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="p-2.5 rounded-full border border-gray-200 dark:border-white/10 bg-white/80 dark:bg-white/5 hover:scale-110 transition-all text-gray-800 dark:text-white shadow-sm"
+                className="p-2.5 rounded-full border border-gray-200 dark:border-white/15 bg-gray-100/80 dark:bg-white/10 hover:scale-105 transition-all text-gray-800 dark:text-white shadow-sm cursor-pointer"
                 aria-label="Toggle Theme"
               >
                 {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}

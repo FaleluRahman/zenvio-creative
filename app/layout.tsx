@@ -39,7 +39,7 @@ import { cn } from "@/lib/utils";
 import { geist, clashDisplay, vamos } from "./fonts";
 import ZenvioChatbot from "@/components/ZenvioChatbot";
 
-const BASE_URL = "https://zenvio.com"; // 🔁 replace with your real domain
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://zenvio.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -103,10 +103,32 @@ export const metadata: Metadata = {
 
   // ── Icons ───────────────────────────────────────────────
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
-    apple: "/apple-touch-icon.png",
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/images/Icon z.png", sizes: "192x192", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: [
+      { url: "/images/Icon z.png", sizes: "180x180", type: "image/png" },
+    ],
   },
+
+  // ── Manifest / PWA ──────────────────────────────────────
+  manifest: "/manifest.webmanifest",
+
+  // ── Theme ───────────────────────────────────────────────
+  other: {
+    "theme-color": "#7c3aed",
+    "color-scheme": "light",
+    "msapplication-TileColor": "#7c3aed",
+  },
+
+  // ── Verification (add real tokens when ready) ────────────
+  // verification: {
+  //   google: "YOUR_GOOGLE_SEARCH_CONSOLE_TOKEN",
+  //   yandex: "YOUR_YANDEX_TOKEN",
+  //   other: { "msvalidate.01": "YOUR_BING_TOKEN" },
+  // },
 
   // ── Robots ──────────────────────────────────────────────
   robots: {
@@ -125,24 +147,36 @@ export const metadata: Metadata = {
 // ── JSON-LD Structured Data (Google rich results) ────────
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "MarketingAgency",
+  "@type": ["ProfessionalService", "MarketingAgency"],
   name: "Zenvio Creative",
   url: BASE_URL,
+  logo: `${BASE_URL}/images/Icon%20z.png`,
+  image: `${BASE_URL}/og-image.jpg`,
   description:
     "Results-driven marketing agency specialising in social media, paid advertising, branding, and content strategy.",
   areaServed: "Worldwide",
-  serviceType: [
-    "Social Media Management",
-    "Paid Advertising",
-    "Branding & Design",
-    "Content Strategy",
-    "Newspaper Ads",
-    "Billboard Ads",
-  ],
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Marketing Services",
+    itemListElement: [
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "Social Media Management" } },
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "Paid Advertising (Meta & Google Ads)" } },
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "Branding & Design" } },
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "Content Strategy" } },
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "Newspaper Ads" } },
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "Billboard Ads" } },
+    ],
+  },
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "customer support",
+    // 🔁 add your real contact email / phone
+    // telephone: "+1-000-000-0000",
+    // email: "hello@zenvio.com",
+    availableLanguage: ["English"],
+  },
   sameAs: [
-    // 🔁 add your real social links
-    // "https://instagram.com/zenvio",
-    // "https://linkedin.com/company/zenvio",
+    "https://www.instagram.com/zenviocreative",
   ],
 };
 

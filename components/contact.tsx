@@ -216,7 +216,7 @@ export default function Contact() {
                   onBlur={(e) => (e.currentTarget.style.borderColor = inputBorder)}
                 />
               </div>
-
+         
               {/* Submit */}
               <div className="flex items-center justify-between flex-wrap gap-5">
                 <p className="text-[13px]" style={{ color: textMuted, fontFamily: "system-ui, -apple-system, sans-serif" }}>

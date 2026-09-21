@@ -74,57 +74,83 @@ function BlurText({ text, className, style, spanStyle, delay = 0, stagger = 80 }
   );
 }
 
-/* ─── TypeText (typewriter for paragraphs) ─── */
-interface TypeTextProps {
-  text: string;
-  className?: string;
+/* ─── TypewriterParagraphs (sequential typing for paragraphs on scroll) ─── */
+interface TypewriterParagraphsProps {
+  paragraphs: string[];
+  trigger: boolean;
   style?: React.CSSProperties;
-  startDelay?: number; // ms before typing begins
-  speed?: number;      // ms per character
-  trigger?: boolean;   // only starts when true
 }
-function TypeText({ text, className, style, startDelay = 0, speed = 22, trigger = true }: TypeTextProps) {
-  const [displayed, setDisplayed] = useState("");
+
+function TypewriterParagraphs({ paragraphs, trigger, style }: TypewriterParagraphsProps) {
+  const [currentParaIndex, setCurrentParaIndex] = useState(0);
+  const [displayedTexts, setDisplayedTexts] = useState<string[]>(
+    paragraphs.map(() => "")
+  );
   const [started, setStarted] = useState(false);
 
   useEffect(() => {
-    if (!trigger) return;
-    const t = setTimeout(() => setStarted(true), startDelay);
-    return () => clearTimeout(t);
-  }, [trigger, startDelay]);
+    if (trigger && !started) {
+      const t = setTimeout(() => setStarted(true), 350);
+      return () => clearTimeout(t);
+    }
+  }, [trigger, started]);
 
   useEffect(() => {
     if (!started) return;
-    if (displayed.length >= text.length) return;
-    const t = setTimeout(() => {
-      setDisplayed(text.slice(0, displayed.length + 1));
-    }, speed);
-    return () => clearTimeout(t);
-  }, [started, displayed, text, speed]);
+    if (currentParaIndex >= paragraphs.length) return;
+
+    const fullText = paragraphs[currentParaIndex];
+    const currentLen = displayedTexts[currentParaIndex].length;
+
+    if (currentLen < fullText.length) {
+      const timer = setTimeout(() => {
+        setDisplayedTexts((prev) => {
+          const next = [...prev];
+          next[currentParaIndex] = fullText.slice(0, currentLen + 1);
+          return next;
+        });
+      }, 16);
+      return () => clearTimeout(timer);
+    } else {
+      const pauseTimer = setTimeout(() => {
+        setCurrentParaIndex((prev) => prev + 1);
+      }, 200);
+      return () => clearTimeout(pauseTimer);
+    }
+  }, [started, currentParaIndex, displayedTexts, paragraphs]);
 
   return (
-    <p className={className} style={{ ...style, minHeight: "1em" }}>
-      {displayed}
-      {started && displayed.length < text.length && (
-        <span
-          style={{
-            display: "inline-block",
-            width: "2px",
-            height: "1em",
-            background: "currentColor",
-            marginLeft: "1px",
-            verticalAlign: "text-bottom",
-            animation: "cursorBlink 0.8s step-end infinite",
-          }}
-        />
-      )}
+    <div className="flex flex-col gap-6">
+      {paragraphs.map((fullText, i) => {
+        const text = displayedTexts[i];
+        const isActive = started && currentParaIndex === i && text.length < fullText.length;
+
+        return (
+          <p key={i} style={{ ...style, minHeight: "1.8em", margin: 0 }}>
+            {text}
+            {isActive && (
+              <span
+                style={{
+                  display: "inline-block",
+                  width: "3px",
+                  height: "1.1em",
+                  backgroundColor: "#8e35f0",
+                  marginLeft: "3px",
+                  verticalAlign: "text-bottom",
+                  animation: "cursorBlink 0.7s step-end infinite",
+                }}
+              />
+            )}
+          </p>
+        );
+      })}
       <style>{`
         @keyframes cursorBlink {
           0%, 100% { opacity: 1; }
           50%       { opacity: 0; }
         }
       `}</style>
-    </p>
+    </div>
   );
 }
 
@@ -144,25 +170,20 @@ export default function About() {
   const dividerColor= dark ? "rgba(128,39,224,0.20)"  : "rgba(109,31,212,0.15)";
   const cardBorder  = dark ? "rgba(128,39,224,0.15)"  : "rgba(109,31,212,0.12)";
 
-  // Light mode: gradient card; dark mode: solid card
-
-
   const cardBg = dark
-  ? "#0f0f0f"
-  : "linear-gradient(135deg, #0d0130 0%, #3b0f8a 50%, #6d1fd4 100%)";
+    ? "#0f0f0f"
+    : "linear-gradient(135deg, #0d0130 0%, #3b0f8a 50%, #6d1fd4 100%)";
+
   const paras = [
     "You've seen brands blow up overnight and wondered — how?",
     "It wasn't luck. It wasn't a bigger budget. It was the right team, at the right time, with the right moves.",
     "Zenvio Creative is what happens when strategy gets obsessed with results — and creativity refuses to play it safe. We're built for brands that refuse to be ignored.",
   ];
 
-
-  const paraDelays = [400, 400 + paras[0].length * 22 + 300, 400 + (paras[0].length + paras[1].length) * 22 + 600];
-
   return (
     <section
       id="about"
-      className="relative w-full overflow-hidden py-16 max-md:py-10"
+      className="relative w-full overflow-hidden py-24 max-md:py-16"
       style={{ backgroundColor: bg }}
     >
       {/* Background glow */}
@@ -175,7 +196,7 @@ export default function About() {
         }}
       />
 
-<div className="w-full px-20 max-lg:px-12 max-md:px-6" ref={ref}>
+      <div className="w-full px-20 max-lg:px-12 max-md:px-6" ref={ref}>
         {/* Eyebrow */}
         <div
           className="flex items-center gap-3 mb-6"
@@ -193,40 +214,39 @@ export default function About() {
           </span>
         </div>
 
-        <div className="grid grid-cols-2 gap-10 items-center max-lg:grid-cols-1 max-lg:gap-12">
+        <div className="grid grid-cols-2 gap-12 items-center max-lg:grid-cols-1 max-lg:gap-12">
           {/* Left: text */}
           <div>
-        <h2
-  className="font-bold leading-[1.06] tracking-[-0.02em] mb-6"
-  style={{
-    fontFamily: "var(--font-clash)",
-    fontSize: "clamp(36px, 5vw, 70px)",
-    color: textPrimary,
-  }}
->
-  {inView && (
-    <>
-      <BlurText text="Not Your" delay={0} stagger={90} />
-      <br />
- <BlurText
-        text="Average"
-        delay={200}
-        stagger={90}
-        spanStyle={{
-          backgroundImage: "linear-gradient(90deg, #3b0f8a, #6d1fd4, #8e35f0)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent",
-          backgroundClip: "text",
-        }}
-      />
-      <br />
-      <BlurText text="Agency." delay={400} stagger={90} />
-    </>
-  )}
-</h2>
+            <h2
+              className="font-bold leading-[1.06] tracking-[-0.02em] mb-6"
+              style={{
+                fontFamily: "var(--font-clash)",
+                fontSize: "clamp(36px, 5vw, 70px)",
+                color: textPrimary,
+              }}
+            >
+              {inView && (
+                <>
+                  <BlurText text="Not Your" delay={0} stagger={90} />{" "}
+                  <BlurText
+                    text="Average"
+                    delay={180}
+                    stagger={90}
+                    spanStyle={{
+                      backgroundImage: "linear-gradient(90deg, #3b0f8a, #6d1fd4, #8e35f0)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                    }}
+                  />
+                  <br />
+                  <BlurText text="Agency." delay={360} stagger={90} />
+                </>
+              )}
+            </h2>
 
             <div
-              className="w-12 h-[3px] rounded mb-7"
+              className="w-12 h-[3px] rounded mb-8"
               style={{
                 background: "linear-gradient(90deg, #6d1fd4, #8e35f0)",
                 opacity: inView ? 1 : 0,
@@ -234,23 +254,17 @@ export default function About() {
               }}
             />
 
-            {/* Paragraphs with TypeText */}
-            {paras.map((text, i) => (
-              <TypeText
-                key={i}
-                text={text}
-                trigger={inView}
-                startDelay={paraDelays[i]}
-                speed={22}
-                className={i < paras.length - 1 ? "mb-5" : ""}
-                style={{
-                  fontSize: "17px",
-                  lineHeight: "1.75",
-                  color: textMuted,
-                  fontFamily: "system-ui, -apple-system, sans-serif",
-                }}
-              />
-            ))}
+            {/* Paragraphs with TypewriterParagraphs */}
+            <TypewriterParagraphs
+              paragraphs={paras}
+              trigger={inView}
+              style={{
+                fontSize: "clamp(17px, 1.6vw, 20px)",
+                lineHeight: "1.8",
+                color: textMuted,
+                fontFamily: "system-ui, -apple-system, sans-serif",
+              }}
+            />
           </div>
 
 {/* Right: stat cards */}
