@@ -38,6 +38,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { geist, clashDisplay, vamos } from "./fonts";
 import ZenvioChatbot from "@/components/ZenvioChatbot";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://zenvio.com";
 
@@ -203,6 +204,9 @@ export default function RootLayout({
 
         {/* Chatbot — renders on every page, floats bottom-right */}
         <ZenvioChatbot />
+
+        {/* WhatsApp Button — renders on every page, floats bottom-left */}
+        <WhatsAppButton />
       </body>
     </html>
   );
