@@ -1,6 +1,6 @@
 "use client";
 
-import { useTheme } from "next-themes";
+import { useIsDark } from "@/lib/use-is-dark";
 import { useEffect, useState, useRef } from "react";
 
 const services = [
@@ -26,16 +26,13 @@ function useInView(threshold = 0.1) {
 }
 
 export default function Contact() {
-  const { resolvedTheme } = useTheme();
-  const [dark, setDark] = useState(false);
-  useEffect(() => { setDark(resolvedTheme === "dark"); }, [resolvedTheme]);
+  const dark = useIsDark();
 
   const { ref, inView } = useInView();
 
   const [selected, setSelected] = useState<string[]>([]);
   const [message, setMessage] = useState("");
   const [sent, setSent] = useState(false);
-  const [sending, setSending] = useState(false);
 
   const bg          = dark ? "#0a0a0a"                : "#f0ecfa";
   const textPrimary = dark ? "#ffffff"                : "#0e0520";
@@ -62,15 +59,18 @@ export default function Contact() {
     return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(formattedText)}`;
   };
 
+  // Open WhatsApp synchronously inside the click — a delayed window.open
+  // is treated as a popup and blocked by most browsers.
   const handleSubmit = () => {
     if (!message.trim()) return;
-    setSending(true);
-    const waUrl = getWhatsAppUrl();
-    setTimeout(() => {
-      setSending(false);
-      setSent(true);
-      window.open(waUrl, "_blank");
-    }, 600);
+    window.open(getWhatsAppUrl(), "_blank", "noopener,noreferrer");
+    setSent(true);
+  };
+
+  const resetForm = () => {
+    setSent(false);
+    setMessage("");
+    setSelected([]);
   };
 
   return (
@@ -85,7 +85,7 @@ export default function Contact() {
       <div className="pointer-events-none absolute -top-20 -left-20 w-[400px] h-[400px] rounded-full"
         style={{ background: "radial-gradient(circle, #4a0fa8 0%, transparent 70%)", opacity: dark ? 0.05 : 0.09, filter: "blur(80px)" }} />
 
-<div className="w-full px-20 max-lg:px-12 max-md:px-6" ref={ref}>
+<div className="relative w-full max-w-[960px] mx-auto px-20 max-lg:px-12 max-md:px-6" ref={ref}>
         {/* Header */}
         <div
           className="text-center mb-14"
@@ -104,7 +104,6 @@ export default function Contact() {
           <h2
             className="font-bold leading-[1.06] tracking-[-0.02em] mb-4"
             style={{
-              fontFamily: "var(--font-clash)",
               fontSize: "clamp(36px, 5.5vw, 76px)",
               color: textPrimary,
             }}
@@ -121,7 +120,7 @@ export default function Contact() {
             </span>
           </h2>
           <p className="text-[16px] leading-[1.65] max-w-[460px] mx-auto"
-            style={{ color: textMuted, fontFamily: "system-ui, -apple-system, sans-serif" }}>
+            style={{ color: textMuted }}>
             Drop us a message. We respond fast — because good opportunities shouldn&apos;t wait.
           </p>
         </div>
@@ -156,11 +155,11 @@ export default function Contact() {
               </div>
               <h3
                 className="font-bold mb-3"
-                style={{ fontFamily: "var(--font-clash)", fontSize: "28px", color: textPrimary }}
+                style={{ fontSize: "28px", color: textPrimary }}
               >
                 Redirecting to WhatsApp!
               </h3>
-              <p className="text-[15px] mb-6 max-w-md" style={{ color: textMuted, fontFamily: "system-ui, -apple-system, sans-serif" }}>
+              <p className="text-[15px] mb-6 max-w-md" style={{ color: textMuted }}>
                 Your message has been formatted. If WhatsApp didn&apos;t open automatically, click the button below to start your conversation.
               </p>
               <a
@@ -177,23 +176,34 @@ export default function Contact() {
               >
                 Open WhatsApp Chat →
               </a>
+              <button
+                type="button"
+                onClick={resetForm}
+                className="mt-5 text-[13px] font-semibold underline underline-offset-4 cursor-pointer"
+                style={{ color: tagColor, background: "none", border: "none" }}
+              >
+                Send another message
+              </button>
             </div>
           ) : (
             <div className="p-10 max-md:p-7">
               {/* Service selector */}
               <div className="mb-8">
                 <p
+                  id="contact-services-label"
                   className="text-[11px] font-bold tracking-[0.18em] uppercase mb-4"
                   style={{ color: tagColor, fontFamily: "var(--font-clash)" }}
                 >
                   What Do You Need?
                 </p>
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-3" role="group" aria-labelledby="contact-services-label">
                   {services.map((s) => {
                     const isActive = selected.includes(s);
                     return (
                       <button
                         key={s}
+                        type="button"
+                        aria-pressed={isActive}
                         onClick={() => toggleService(s)}
                         className="text-[12px] font-semibold tracking-wide uppercase px-4 py-2 rounded-full transition-all duration-250"
                         style={{
@@ -217,13 +227,15 @@ export default function Contact() {
 
               {/* Textarea */}
               <div className="mb-8">
-                <p
-                  className="text-[11px] font-bold tracking-[0.18em] uppercase mb-3"
+                <label
+                  htmlFor="contact-message"
+                  className="block text-[11px] font-bold tracking-[0.18em] uppercase mb-3"
                   style={{ color: tagColor, fontFamily: "var(--font-clash)" }}
                 >
                   Tell Us More
-                </p>
+                </label>
                 <textarea
+                  id="contact-message"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Tell us about your brand, your goals, and what's holding you back..."
@@ -233,22 +245,25 @@ export default function Contact() {
                     background: inputBg,
                     border: `1px solid ${inputBorder}`,
                     color: textPrimary,
-                    fontFamily: "system-ui, -apple-system, sans-serif",
                     boxSizing: "border-box",
                   }}
                   onFocus={(e) => (e.currentTarget.style.borderColor = inputFocus)}
                   onBlur={(e) => (e.currentTarget.style.borderColor = inputBorder)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) handleSubmit();
+                  }}
                 />
               </div>
          
               {/* Submit */}
               <div className="flex items-center justify-between flex-wrap gap-5">
-                <p className="text-[13px]" style={{ color: textMuted, fontFamily: "system-ui, -apple-system, sans-serif" }}>
+                <p className="text-[13px]" style={{ color: textMuted }}>
                   No spam. No long waits. Just real conversations.
                 </p>
                 <button
+                  type="button"
                   onClick={handleSubmit}
-                  disabled={sending || !message.trim()}
+                  disabled={!message.trim()}
                   className="inline-flex items-center gap-2 font-semibold tracking-wide transition-all duration-300"
                   style={{
                     fontFamily: "var(--font-clash)",
@@ -263,7 +278,6 @@ export default function Contact() {
                     borderRadius: "8px",
                     cursor: message.trim() ? "pointer" : "not-allowed",
                     boxShadow: message.trim() ? "0 4px 20px rgba(109,31,212,0.35)" : "none",
-                    opacity: sending ? 0.7 : 1,
                   }}
                   onMouseEnter={(e) => {
                     if (!message.trim()) return;
@@ -277,7 +291,7 @@ export default function Contact() {
                       : "none";
                   }}
                 >
-                  {sending ? "Sending…" : "Send It →"}
+                  Send via WhatsApp →
                 </button>
               </div>
             </div>

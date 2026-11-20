@@ -1,14 +1,13 @@
 "use client";
 
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useIsDark } from "@/lib/use-is-dark";
 
 const navLinks = [
   { label: "Home",     href: "#home" },
   { label: "About",   href: "#about" },
+  { label: "Why Us",   href: "#why" },
   { label: "Services", href: "#services" },
   { label: "Portfolio", href: "#portfolio" },
-  { label: "Why Us",   href: "#why-us" },
   { label: "Contact",  href: "#contact" },
 ];
 
@@ -36,9 +35,7 @@ const socials = [
 ];
 
 export default function Footer() {
-  const { resolvedTheme } = useTheme();
-  const [dark, setDark] = useState(false);
-  useEffect(() => { setDark(resolvedTheme === "dark"); }, [resolvedTheme]);
+  const dark = useIsDark();
 
   const bg        = dark ? "#080808" : "#0d0130";
   const textMuted = "rgba(255,255,255,0.45)";
@@ -65,12 +62,11 @@ export default function Footer() {
         }}
       >
         {/* Logo */}
-        <a href="#" style={{ textDecoration: "none", flexShrink: 0 }}>
+        <a href="#home" aria-label="Zenvio — back to top" style={{ textDecoration: "none", flexShrink: 0 }}>
           <span
             style={{
               fontFamily: "var(--font-vamos, var(--font-clash))",
               fontSize: "18px",
-              fontWeight: 700,
               background: "linear-gradient(90deg, #8027e0, #c084fc)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
@@ -90,7 +86,6 @@ export default function Footer() {
               style={{
                 fontSize: "13px",
                 color: textMuted,
-                fontFamily: "system-ui, -apple-system, sans-serif",
                 textDecoration: "none",
                 transition: "color 0.2s ease",
               }}
@@ -150,7 +145,6 @@ export default function Footer() {
             style={{
               fontSize: "12px",
               color: textMuted,
-              fontFamily: "system-ui, -apple-system, sans-serif",
               margin: 0,
               whiteSpace: "nowrap",
             }}

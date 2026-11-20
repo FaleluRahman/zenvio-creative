@@ -7,6 +7,7 @@ import { Sun, Moon, Menu, X } from "lucide-react";
 const navLinks = [
   { label: "Home", href: "#home" },
   { label: "About", href: "#about" },
+  { label: "Services", href: "#services" },
   { label: "Portfolio", href: "#portfolio" },
   { label: "Contact", href: "#contact" },
 ];
@@ -28,10 +29,34 @@ export default function Navbar() {
     };
   }, []);
 
-  // Lock body scroll when menu is open
+  // Scroll-spy: highlight the link of the section currently in view
+  useEffect(() => {
+    const sections = navLinks
+      .map((l) => document.querySelector<HTMLElement>(l.href))
+      .filter((el): el is HTMLElement => !!el);
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          const link = navLinks.find((l) => l.href === `#${e.target.id}`);
+          if (link) setActive(link.label);
+        });
+      },
+      { rootMargin: "-45% 0px -50% 0px" }
+    );
+    sections.forEach((el) => obs.observe(el));
+    return () => obs.disconnect();
+  }, []);
+
+  // Lock body scroll + close on Escape when menu is open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setMenuOpen(false); };
+    if (menuOpen) window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
+    };
   }, [menuOpen]);
 
   return (
@@ -49,11 +74,12 @@ export default function Navbar() {
           }`}
         >
           <a
-            href="#"
-            className="text-xl font-bold tracking-tight select-none flex items-center"
+            href="#home"
+            aria-label="Zenvio — back to top"
+            className="text-xl tracking-tight select-none flex items-center"
             style={{ fontFamily: "var(--font-vamos)" }}
           >
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-700 via-purple-600 to-purple-400 font-extrabold">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-700 via-purple-600 to-purple-400">
               Zenvio
             </span>
          
@@ -73,6 +99,7 @@ export default function Navbar() {
                 <a
                   href={link.href}
                   onClick={() => setActive(link.label)}
+                  aria-current={active === link.label ? "page" : undefined}
                   className={`text-sm font-semibold transition-colors ${
                     active === link.label
                       ? "text-purple-700 dark:text-purple-400 font-bold"
@@ -91,16 +118,19 @@ export default function Navbar() {
               <button
                 onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                 className="p-2.5 rounded-full border border-gray-200 dark:border-white/15 bg-gray-100/80 dark:bg-white/10 hover:scale-105 transition-all text-gray-800 dark:text-white shadow-sm cursor-pointer"
-                aria-label="Toggle Theme"
+                aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
               >
                 {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
               </button>
             )}
 
             <button
+              type="button"
               onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden text-gray-800 dark:text-white"
-              aria-label="Toggle Menu"
+              className="md:hidden p-1 text-gray-800 dark:text-white"
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-menu"
             >
               {menuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -110,6 +140,9 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       <div
+        id="mobile-menu"
+        aria-hidden={!menuOpen}
+        inert={!menuOpen}
         className={`fixed inset-0 z-[60] md:hidden flex flex-col transition-all duration-500 ease-in-out ${
           menuOpen
             ? "opacity-100 pointer-events-auto"
@@ -164,7 +197,7 @@ export default function Navbar() {
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               className="mt-4 p-3 rounded-full border border-gray-200 dark:border-white/10 bg-white/80 dark:bg-white/5 text-gray-800 dark:text-white shadow-sm"
-              aria-label="Toggle Theme"
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
             >
               {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
             </button>

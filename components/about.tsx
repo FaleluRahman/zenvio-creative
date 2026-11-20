@@ -1,6 +1,6 @@
 "use client";
 
-import { useTheme } from "next-themes";
+import { useIsDark } from "@/lib/use-is-dark";
 import { useEffect, useState, useRef } from "react";
 
 const stats = [
@@ -36,27 +36,30 @@ function useInView(threshold = 0.15) {
   return { ref, inView };
 }
 
-/* ─── BlurText ─── */
+/* ─── BlurText ───
+   Words are always in the DOM (SEO / screen readers); they stay hidden
+   until `play` flips true, then blur-fade in. Keyframes live in globals.css. */
 interface BlurTextProps {
   text: string;
-  className?: string;
-  style?: React.CSSProperties;
+  play: boolean;
   delay?: number; // base delay in ms before animation starts
   stagger?: number; // ms between each word
+  spanStyle?: React.CSSProperties;
 }
-function BlurText({ text, className, style, spanStyle, delay = 0, stagger = 80 }: BlurTextProps & { spanStyle?: React.CSSProperties }) {
+function BlurText({ text, play, spanStyle, delay = 0, stagger = 80 }: BlurTextProps) {
   const words = text.split(" ");
   return (
-    <span className={className} style={{ display: "inline", ...style }}>
+    <span style={{ display: "inline" }}>
       {words.map((word, i) => (
         <span
           key={i}
           style={{
             display: "inline-block",
             opacity: 0,
-            filter: "blur(12px)",
-            animation: `blurFadeIn 0.65s ease forwards`,
-            animationDelay: `${delay + i * stagger}ms`,
+            ...(play && {
+              animation: "blurFadeIn 0.65s ease forwards",
+              animationDelay: `${delay + i * stagger}ms`,
+            }),
             marginRight: i < words.length - 1 ? "0.25em" : 0,
             ...spanStyle,
           }}
@@ -64,17 +67,13 @@ function BlurText({ text, className, style, spanStyle, delay = 0, stagger = 80 }
           {word}
         </span>
       ))}
-      <style>{`
-        @keyframes blurFadeIn {
-          0%   { opacity: 0; filter: blur(12px); transform: translateY(10px); }
-          100% { opacity: 1; filter: blur(0px);  transform: translateY(0); }
-        }
-      `}</style>
     </span>
   );
 }
 
-/* ─── TypewriterParagraphs (sequential typing for paragraphs on scroll) ─── */
+/* ─── TypewriterParagraphs (sequential typing for paragraphs on scroll) ───
+   The untyped remainder is rendered invisibly, so the block never changes
+   height and the full copy is always in the HTML. */
 interface TypewriterParagraphsProps {
   paragraphs: string[];
   trigger: boolean;
@@ -82,85 +81,72 @@ interface TypewriterParagraphsProps {
 }
 
 function TypewriterParagraphs({ paragraphs, trigger, style }: TypewriterParagraphsProps) {
-  const [currentParaIndex, setCurrentParaIndex] = useState(0);
-  const [displayedTexts, setDisplayedTexts] = useState<string[]>(
-    paragraphs.map(() => "")
-  );
+  const [paraIndex, setParaIndex] = useState(0);
+  const [charCount, setCharCount] = useState(0);
   const [started, setStarted] = useState(false);
+  const [skip, setSkip] = useState(false);
 
   useEffect(() => {
-    if (trigger && !started) {
-      const t = setTimeout(() => setStarted(true), 350);
-      return () => clearTimeout(t);
-    }
+    if (!trigger || started) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const t = setTimeout(() => {
+      setSkip(reduce);
+      setStarted(true);
+    }, reduce ? 0 : 350);
+    return () => clearTimeout(t);
   }, [trigger, started]);
 
   useEffect(() => {
-    if (!started) return;
-    if (currentParaIndex >= paragraphs.length) return;
-
-    const fullText = paragraphs[currentParaIndex];
-    const currentLen = displayedTexts[currentParaIndex].length;
-
-    if (currentLen < fullText.length) {
-      const timer = setTimeout(() => {
-        setDisplayedTexts((prev) => {
-          const next = [...prev];
-          next[currentParaIndex] = fullText.slice(0, currentLen + 1);
-          return next;
-        });
-      }, 16);
-      return () => clearTimeout(timer);
-    } else {
-      const pauseTimer = setTimeout(() => {
-        setCurrentParaIndex((prev) => prev + 1);
-      }, 200);
-      return () => clearTimeout(pauseTimer);
-    }
-  }, [started, currentParaIndex, displayedTexts, paragraphs]);
+    if (!started || skip || paraIndex >= paragraphs.length) return;
+    const full = paragraphs[paraIndex];
+    const t =
+      charCount < full.length
+        ? setTimeout(() => setCharCount((c) => c + 1), 16)
+        : setTimeout(() => {
+            setParaIndex((i) => i + 1);
+            setCharCount(0);
+          }, 200);
+    return () => clearTimeout(t);
+  }, [started, skip, paraIndex, charCount, paragraphs]);
 
   return (
     <div className="flex flex-col gap-6">
-      {paragraphs.map((fullText, i) => {
-        const text = displayedTexts[i];
-        const isActive = started && currentParaIndex === i && text.length < fullText.length;
-
+      {paragraphs.map((full, i) => {
+        const shown =
+          skip || i < paraIndex ? full.length : i === paraIndex && started ? charCount : 0;
+        const isActive = started && !skip && i === paraIndex && shown < full.length;
         return (
-          <p key={i} style={{ ...style, minHeight: "1.8em", margin: 0 }}>
-            {text}
+          <p key={i} style={{ ...style, margin: 0 }}>
+            {full.slice(0, shown)}
             {isActive && (
               <span
+                aria-hidden="true"
                 style={{
                   display: "inline-block",
                   width: "3px",
                   height: "1.1em",
                   backgroundColor: "#8e35f0",
                   marginLeft: "3px",
+                  marginRight: "-6px",
                   verticalAlign: "text-bottom",
                   animation: "cursorBlink 0.7s step-end infinite",
                 }}
               />
             )}
+            <span style={{ opacity: 0 }}>{full.slice(shown)}</span>
           </p>
         );
       })}
-      <style>{`
-        @keyframes cursorBlink {
-          0%, 100% { opacity: 1; }
-          50%       { opacity: 0; }
-        }
-      `}</style>
     </div>
   );
 }
 
 /* ─── Main Component ─── */
 export default function About() {
-  const { resolvedTheme } = useTheme();
-  const [dark, setDark] = useState(false);
-  useEffect(() => { setDark(resolvedTheme === "dark"); }, [resolvedTheme]);
+  const dark = useIsDark();
 
   const { ref, inView } = useInView();
+  const [flipped, setFlipped] = useState<number | null>(null);
 
   const bg          = dark ? "#080808"                : "#f7f3ff";
   const textPrimary = dark ? "#ffffff"                : "#0e0520";
@@ -196,7 +182,7 @@ export default function About() {
         }}
       />
 
-      <div className="w-full px-20 max-lg:px-12 max-md:px-6" ref={ref}>
+      <div className="relative w-full max-w-[1440px] mx-auto px-20 max-lg:px-12 max-md:px-6" ref={ref}>
         {/* Eyebrow */}
         <div
           className="flex items-center gap-3 mb-6"
@@ -220,29 +206,25 @@ export default function About() {
             <h2
               className="font-bold leading-[1.06] tracking-[-0.02em] mb-6"
               style={{
-                fontFamily: "var(--font-clash)",
                 fontSize: "clamp(36px, 5vw, 70px)",
                 color: textPrimary,
               }}
             >
-              {inView && (
-                <>
-                  <BlurText text="Not Your" delay={0} stagger={90} />{" "}
-                  <BlurText
-                    text="Average"
-                    delay={180}
-                    stagger={90}
+              <BlurText text="Not Your" play={inView} delay={0} stagger={90} />{" "}
+              <BlurText
+                text="Average"
+                play={inView}
+                delay={180}
+                stagger={90}
                     spanStyle={{
                       backgroundImage: "linear-gradient(90deg, #3b0f8a, #6d1fd4, #8e35f0)",
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                       backgroundClip: "text",
                     }}
-                  />
-                  <br />
-                  <BlurText text="Agency." delay={360} stagger={90} />
-                </>
-              )}
+              />
+              <br />
+              <BlurText text="Agency." play={inView} delay={360} stagger={90} />
             </h2>
 
             <div
@@ -262,7 +244,6 @@ export default function About() {
                 fontSize: "clamp(17px, 1.6vw, 20px)",
                 lineHeight: "1.8",
                 color: textMuted,
-                fontFamily: "system-ui, -apple-system, sans-serif",
               }}
             />
           </div>
@@ -272,7 +253,18 @@ export default function About() {
   {stats.map((s, i) => (
     <div
       key={s.label}
-      className="flip-card"
+      role="button"
+      tabIndex={0}
+      aria-pressed={flipped === i}
+      aria-label={`${s.label}: ${s.desc} Tap to see more.`}
+      onClick={() => setFlipped((f) => (f === i ? null : i))}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setFlipped((f) => (f === i ? null : i));
+        }
+      }}
+      className={`flip-card cursor-pointer rounded-2xl ${flipped === i ? "is-flipped" : ""}`}
       style={{
         opacity: inView ? 1 : 0,
         transform: inView ? "translateX(0)" : "translateX(40px)",
@@ -325,7 +317,6 @@ export default function About() {
             className="text-[14px] leading-[1.65] m-0"
             style={{
               color: dark ? textMuted : "rgba(255,255,255,0.75)",
-              fontFamily: "system-ui, -apple-system, sans-serif",
             }}
           >
             {s.desc}
@@ -378,7 +369,6 @@ export default function About() {
             className="text-[14px] leading-[1.7] m-0"
             style={{
               color: "rgba(255,255,255,0.75)",
-              fontFamily: "system-ui, -apple-system, sans-serif",
             }}
           >
             {s.backDesc}

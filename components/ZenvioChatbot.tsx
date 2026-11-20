@@ -23,7 +23,11 @@ export default function ZenvioChatbot() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    if (isOpen) inputRef.current?.focus();
+    if (!isOpen) return;
+    inputRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setIsOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [isOpen]);
 
   useEffect(() => {
@@ -53,10 +57,16 @@ export default function ZenvioChatbot() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: updatedMessages }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: data.reply ?? "Something went wrong." },
+        {
+          role: "assistant",
+          content:
+            res.ok && data.reply
+              ? data.reply
+              : data.error ?? "Something went wrong. Try again, or message us on WhatsApp.",
+        },
       ]);
     } catch {
       setMessages((prev) => [
@@ -176,6 +186,8 @@ export default function ZenvioChatbot() {
       <div
         role="dialog"
         aria-label="Zenvio Creative chat assistant"
+        aria-hidden={!isOpen}
+        inert={!isOpen}
         style={{
           position: "fixed",
           /* Mobile: anchor to all four sides with safe margins */
@@ -246,7 +258,7 @@ export default function ZenvioChatbot() {
             <div>
               <p style={{ margin: 0, fontSize: "13px", fontWeight: 600, color: "#fff", letterSpacing: "0.2px" }}>
                 Zenvio{" "}
-                <span style={{ color: "#444", fontWeight: 400 }}>Assistant</span>
+                <span style={{ color: "#8a8a8a", fontWeight: 400 }}>Assistant</span>
               </p>
               <p style={{ margin: 0, fontSize: "11px", color: "#7b3fe4", display: "flex", alignItems: "center", gap: "5px" }}>
                 <span
@@ -344,6 +356,7 @@ export default function ZenvioChatbot() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Ask anything about Zenvio…"
+              aria-label="Message the Zenvio assistant"
               rows={1}
               style={{
                 flex: 1,
@@ -385,7 +398,7 @@ export default function ZenvioChatbot() {
               </svg>
             </button>
           </div>
-          <p style={{ margin: "8px 0 0", textAlign: "center", fontSize: "11px", color: "#2a2a2a", letterSpacing: "0.3px" }}>
+          <p style={{ margin: "8px 0 0", textAlign: "center", fontSize: "11px", color: "#555", letterSpacing: "0.3px" }}>
             Powered by Zenvio AI
           </p>
         </div>
@@ -444,8 +457,10 @@ function IconBtn({
   const [hovered, setHovered] = useState(false);
   return (
     <button
+      type="button"
       onClick={onClick}
       title={title}
+      aria-label={title}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{

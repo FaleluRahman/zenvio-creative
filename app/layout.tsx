@@ -1,42 +1,8 @@
-// import type { Metadata } from "next";
-// import { Providers } from "./providers";
-// import "./globals.css";
-// import { cn } from "@/lib/utils";
-// import { geist, clashDisplay, vamos } from "./fonts";
-
-// export const metadata: Metadata = {
-//   title: "Zenvio Creative",
-//   description: "Bold marketing agency built for brands that move people.",
-// };
-
-// export default function RootLayout({
-//   children,
-// }: {
-//   children: React.ReactNode;
-// }) {
-//   return (
-//     <html
-//       lang="en"
-//       suppressHydrationWarning
-//       className={cn(
-//         geist.variable,
-//         clashDisplay.variable,
-//         vamos.variable
-//       )}
-//     >
-//       <body className="min-h-screen bg-background font-dm antialiased transition-colors duration-300">
-//         <Providers>{children}</Providers>
-//       </body>
-//     </html>
-//   );
-// }
-
-
 import type { Metadata } from "next";
 import { Providers } from "./providers";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { geist, clashDisplay, vamos } from "./fonts";
+import { clashDisplay, vamos, pangram, brother } from "./fonts";
 import ZenvioChatbot from "@/components/ZenvioChatbot";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
@@ -190,7 +156,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn(geist.variable, clashDisplay.variable, vamos.variable)}
+      className={cn(clashDisplay.variable, vamos.variable, pangram.variable, brother.variable)}
     >
       <head>
         {/* JSON-LD structured data for Google */}

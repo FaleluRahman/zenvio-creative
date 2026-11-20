@@ -1,6 +1,6 @@
 "use client";
 
-import { useTheme } from "next-themes";
+import { useIsDark } from "@/lib/use-is-dark";
 import { useEffect, useState, useRef, useMemo, useId } from "react";
 import BlurText from "./reactbits/motion";
 
@@ -266,13 +266,25 @@ const cardData = [
   },
 ];
 
+/* ── Rotating headlines ── */
+const headlines = [
+  {
+    line1: { text: "Make Noise.", gradient: false },
+    line2: { text: "Make History.", gradient: "Make" },
+  },
+  {
+    line1: { text: "Think Sharp.", gradient: false },
+    line2: { text: "Grow Faster.", gradient: "Grow" },
+  },
+  {
+    line1: { text: "Attention", gradient: false },
+    line2: { text: "Into Impact.", gradient: "Impact." },
+  },
+];
+
 /* ── Hero ── */
 export default function Hero() {
-  const { resolvedTheme } = useTheme();
-  const [dark, setDark] = useState(false);
-  useEffect(() => {
-    setDark(resolvedTheme === "dark");
-  }, [resolvedTheme]);
+  const dark = useIsDark();
 
   const [activeCard, setActiveCard] = useState(0);
   useEffect(() => {
@@ -283,21 +295,6 @@ export default function Hero() {
     return () => clearInterval(interval);
   }, []);
 
-  /* ── Rotating headlines ── */
-  const headlines = [
-    {
-      line1: { text: "Make Noise.", gradient: false },
-      line2: { text: "Make History.", gradient: "Make" },
-    },
-    {
-      line1: { text: "Think Sharp.", gradient: false },
-      line2: { text: "Grow Faster.", gradient: "Grow" },
-    },
-    {
-      line1: { text: "Attention", gradient: false },
-      line2: { text: "Into Impact.", gradient: "Impact." },
-    },
-  ];
   const [headlineIndex, setHeadlineIndex] = useState(0);
   const [headlineKey, setHeadlineKey] = useState(0);
 
@@ -312,7 +309,6 @@ export default function Hero() {
   /* ── Theme tokens ── */
   const bg           = dark ? "#0a0a0a"                : "#f0ecfa";
   const textPrimary  = dark ? "#ffffff"                : "#0e0520";
-  const textMuted    = dark ? "rgba(255, 255, 255, 0.75)" : "rgba(14, 5, 32, 0.70)";
   const cardBorder   = dark ? "rgba(128,39,224,0.20)"  : "rgba(109,31,212,0.18)";
   const cardActiveBdr= dark ? "rgba(142,53,240,0.60)"  : "rgba(109,31,212,0.50)";
   const cardShadow   = dark
@@ -331,8 +327,9 @@ export default function Hero() {
 
   return (
     <section
-      className="relative w-full flex flex-col lg:flex-row items-stretch overflow-hidden transition-colors duration-300"
-      style={{ backgroundColor: bg, minHeight: "100vh" }}
+      id="home"
+      className="relative w-full flex flex-col lg:flex-row items-stretch overflow-hidden transition-colors duration-300 min-h-svh"
+      style={{ backgroundColor: bg }}
     >
       {/* ── Glows ── */}
       <div
@@ -357,9 +354,8 @@ export default function Hero() {
 
         {/* ── H1: Rotating BlurText headlines ── */}
         <h1
-          className="font-medium leading-[1.08] tracking-[-0.02em] mb-6 max-w-[960px]"
+          className="font-bold leading-[1.08] tracking-[-0.02em] mb-6 max-w-[960px]"
           style={{
-            fontFamily: "var(--font-clash)",
             fontSize: "clamp(42px, 6.5vw, 96px)",
             color: textPrimary,
           }}
@@ -414,10 +410,8 @@ export default function Hero() {
 
       {/* ── P tag: TextType (typing animation) ── */}
 <p
-  className="text-[17px] leading-[1.2] max-w-125 mb-7"
+  className="text-[17px] md:text-[19px] leading-[1.45] max-w-125 mb-8 min-h-[4.35em] md:min-h-[2.9em]"
   style={{
-    fontFamily: "system-ui, -apple-system, sans-serif",
-    minHeight: "2.4em",
     background: "linear-gradient(90deg, #580ca5, #8027e0)",
     WebkitBackgroundClip: "text",
     WebkitTextFillColor: "transparent",
@@ -439,11 +433,11 @@ export default function Hero() {
   />
 </p>
         {/* ── CTA Buttons ── */}
-        <div className="flex gap-4 flex-wrap">
+        <div className="flex gap-4 flex-wrap max-sm:flex-col max-sm:gap-3">
           {/* Primary: What We Do */}
           <a
             href="#services"
-            className="group relative inline-flex items-center gap-2 font-semibold tracking-wide transition-all duration-300"
+            className="group relative inline-flex items-center justify-center gap-2 font-semibold tracking-wide transition-all duration-300"
             style={{
               fontFamily: "var(--font-clash)",
               fontSize: "clamp(13px, 1.4vw, 15px)",
@@ -491,7 +485,7 @@ export default function Hero() {
           {/* Secondary: Let's Connect */}
           <a
             href="#contact"
-            className="inline-flex items-center gap-2 font-semibold tracking-wide transition-all duration-300"
+            className="inline-flex items-center justify-center gap-2 font-semibold tracking-wide transition-all duration-300"
             style={{
               fontFamily: "var(--font-clash)",
               fontSize: "clamp(13px, 1.4vw, 15px)",
@@ -540,25 +534,26 @@ export default function Hero() {
       </div>
 
       {/* ════════════ RIGHT — Cards ════════════ */}
-      <div className="relative flex-[0_0_45%] flex items-center justify-center overflow-visible z-10 max-lg:flex-[0_0_auto] max-lg:justify-center max-lg:px-10 max-lg:pb-20 max-md:px-6 max-md:pb-16">
+      <div className="relative flex-[0_0_45%] flex items-center justify-center overflow-visible z-10 max-lg:flex-[0_0_auto] max-lg:justify-center max-lg:px-10 max-lg:pb-32 max-md:px-6 max-md:pb-36 max-md:pt-10">
 
         <div
           className="relative"
           style={{
-            width: "min(340px, 80vw)",
-            height: "min(260px, 62vw)",
+            width: "min(340px, 70vw)",
+            height: "min(260px, 56vw)",
             perspective: 900,
-            transform: "translateX(4%) translateY(6%)",
+            /* centre the whole fanned-out stack (cards fan right/up by 2 steps) */
+            transform: "translate(calc(-1 * min(44px, 8vw)), min(50px, 9vw))",
           }}
         >
           {cardData.map((card, i) => {
             const total = cardData.length;
-            const dist = 44, vDist = 50, skew = 6;
+            const skew = 6;
             const isActive = i === activeCard;
             const slot = {
-              x: i * dist,
-              y: -i * vDist,
-              z: -i * dist * 1.5,
+              x: `calc(${i} * min(44px, 8vw))`,
+              y: `calc(${-i} * min(50px, 9vw))`,
+              z: `${-i * 66}px`,
               zIndex: total - i,
             };
 
@@ -569,23 +564,28 @@ export default function Hero() {
             const cardTextMuted = dark
               ? "rgba(255,255,255,0.42)"
               : "rgba(255,255,255,0.70)";
+            const contentFade: React.CSSProperties = {
+              opacity: isActive ? 1 : 0,
+              transition: isActive ? "opacity 0.45s ease 0.3s" : "opacity 0.2s ease",
+            };
             const cardStatColor = dark
               ? undefined
               : "rgba(255,255,255,0.95)";
 
             return (
               <div
-                key={i}
+                key={card.label}
+                aria-hidden={!isActive}
                 className="absolute rounded-[20px] flex flex-col justify-between overflow-hidden box-border"
                 style={{
-                  width: "min(340px, 80vw)",
-                  height: "min(260px, 62vw)",
+                  width: "min(340px, 70vw)",
+                  height: "min(260px, 56vw)",
                   top: "50%",
                   left: "50%",
                   padding: "clamp(16px, 4vw, 28px) clamp(18px, 5vw, 32px)",
                   transform: isActive
                     ? `translate(-50%, -50%) translate3d(0px, 0px, 0px) skewY(${skew}deg)`
-                    : `translate(-50%, -50%) translate3d(${slot.x}px, ${slot.y}px, ${slot.z}px) skewY(${skew}deg)`,
+                    : `translate(-50%, -50%) translate3d(${slot.x}, ${slot.y}, ${slot.z}) skewY(${skew}deg)`,
                   transformOrigin: "center center",
                   zIndex: isActive ? total + 1 : slot.zIndex,
                   border: `1px solid ${isActive ? cardActiveBdr : cardBorder}`,
@@ -606,10 +606,11 @@ export default function Hero() {
                   }}
                 />
 
-                {/* Label */}
+                {/* Label — content only on the front card, back cards read as clean layers */}
                 <p
                   className="text-[10px] font-bold tracking-[0.18em] uppercase m-0"
                   style={{
+                    ...contentFade,
                     color: cardTextMuted,
                     fontFamily: "var(--font-clash)",
                   }}
@@ -618,7 +619,7 @@ export default function Hero() {
                 </p>
 
                 {/* Stat */}
-                <div>
+                <div style={contentFade}>
                   <div
                     className="font-bold leading-none mb-1"
                     style={{
@@ -649,10 +650,10 @@ export default function Hero() {
 
                 {/* Description */}
                 <p
-                  className="text-[13px] leading-[1.65] m-0"
+                  className="text-[13px] leading-[1.6] m-0 max-sm:text-[12px] max-sm:line-clamp-2"
                   style={{
+                    ...contentFade,
                     color: cardTextMuted,
-                    fontFamily: "system-ui, -apple-system, sans-serif",
                   }}
                 >
                   {card.desc}

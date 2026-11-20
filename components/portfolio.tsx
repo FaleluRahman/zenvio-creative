@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useTheme } from "next-themes";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useIsDark } from "@/lib/use-is-dark";
+import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, X, ChevronLeft, ChevronRight } from "lucide-react";
 
 /* ─── Portfolio Data ──────────────────────────────────────────── */
@@ -142,10 +142,7 @@ const hostOf = (url: string) => new URL(url).hostname.replace(/^www\./, "");
 
 /* ─── Component ──────────────────────────────────────────────── */
 export default function Portfolio() {
-  const { resolvedTheme } = useTheme();
-  // Hydration-safe: false on server, true after mount
-  const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
-  const dark = mounted && resolvedTheme === "dark";
+  const dark = useIsDark();
 
   const { ref, inView } = useInView();
   const [activeFilter, setActiveFilter] = useState<"all" | Category>("all");
@@ -211,7 +208,7 @@ export default function Portfolio() {
         }}
       />
 
-      <div ref={ref} className="relative w-full px-20 max-lg:px-12 max-md:px-6">
+      <div ref={ref} className="relative w-full max-w-[1440px] mx-auto px-20 max-lg:px-12 max-md:px-6">
         {/* Header */}
         <div
           className="text-center max-w-3xl mx-auto mb-12 md:mb-16"
@@ -237,7 +234,6 @@ export default function Portfolio() {
 
           <h2
             className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.08] mb-6"
-            style={{ fontFamily: "var(--font-clash), sans-serif" }}
           >
             Work That Speaks.<br className="hidden sm:block" />
             <span
@@ -341,7 +337,6 @@ export default function Portfolio() {
                       </span>
                       <h3
                         className="text-2xl font-bold mt-4 tracking-tight"
-                        style={{ fontFamily: "var(--font-clash), sans-serif" }}
                       >
                         {site.title}
                       </h3>
@@ -400,7 +395,6 @@ export default function Portfolio() {
                   </span>
                   <h3
                     className="text-sm md:text-lg font-bold leading-tight"
-                    style={{ fontFamily: "var(--font-clash), sans-serif" }}
                   >
                     {work.title}
                   </h3>

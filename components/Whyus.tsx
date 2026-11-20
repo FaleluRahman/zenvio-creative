@@ -1,9 +1,8 @@
 "use client";
 
-import { useTheme } from "next-themes";
+import { useIsDark } from "@/lib/use-is-dark";
 import { useEffect, useState, useRef } from "react";
 import SpotlightCard from "./reactbits/card";
-// import SpotlightCard from './SpotlightCard';
 
 const reasons = [
   {
@@ -46,9 +45,7 @@ function useInView(threshold = 0.1) {
 }
 
 export default function WhyUs() {
-  const { resolvedTheme } = useTheme();
-  const [dark, setDark] = useState(false);
-  useEffect(() => { setDark(resolvedTheme === "dark"); }, [resolvedTheme]);
+  const dark = useIsDark();
 
   const { ref, inView } = useInView();
 
@@ -78,7 +75,7 @@ export default function WhyUs() {
       <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px]"
         style={{ background: "radial-gradient(ellipse, #6d1fd4 0%, transparent 70%)", opacity: dark ? 0.06 : 0.10, filter: "blur(80px)" }} />
 
-<div className="w-full px-20 max-lg:px-12 max-md:px-6" ref={ref}>
+<div className="relative w-full max-w-[1440px] mx-auto px-20 max-lg:px-12 max-md:px-6" ref={ref}>
         {/* Header */}
         <div className="text-center mb-16 max-w-[700px] mx-auto"
           style={{
@@ -96,7 +93,6 @@ export default function WhyUs() {
           <h2
             className="font-bold leading-[1.06] tracking-[-0.02em] mb-5"
             style={{
-              fontFamily: "var(--font-clash)",
               fontSize: "clamp(32px, 4.5vw, 62px)",
               color: textPrimary,
             }}
@@ -117,57 +113,64 @@ export default function WhyUs() {
         {/* Grid */}
         <div className="grid grid-cols-3 gap-5 mb-20 max-lg:grid-cols-2 max-md:grid-cols-1">
           {reasons.map((r, i) => (
-            <SpotlightCard
+            <div
               key={r.title}
-              spotlightColor={spotlightColor}
-              className="relative"
-style={{
+              style={{
                 opacity: inView ? 1 : 0,
                 transform: inView ? "translateY(0) scale(1)" : "translateY(32px) scale(0.97)",
                 transition: `opacity 0.65s ease ${0.08 * i}s, transform 0.65s ease ${0.08 * i}s`,
-                background: cardBg,
-                borderColor: dark ? "rgba(128,39,224,0.14)" : "rgba(109,31,212,0.10)",
-              }}
-              onMouseEnter={(e) => {
-                const el = e.currentTarget as HTMLDivElement;
-                el.style.opacity = "0.82";
-                el.style.transform = "translateY(-4px) scale(1.02)";
-                el.style.transition = "opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease";
-                el.style.boxShadow = dark ? "0 16px 48px rgba(128,39,224,0.30)" : "0 16px 48px rgba(128,39,224,0.45)";
-              }}
-              onMouseLeave={(e) => {
-                const el = e.currentTarget as HTMLDivElement;
-                el.style.opacity = "1";
-                el.style.transform = "translateY(0) scale(1)";
-                el.style.transition = "opacity 0.4s ease, transform 0.4s ease, box-shadow 0.4s ease";
-                el.style.boxShadow = "none";
               }}
             >
-              {/* Top gradient bar */}
-              <div
-                className="absolute top-0 left-0 right-0 h-[2px] rounded-t-3xl"
-                style={{ background: "linear-gradient(90deg, #4a0fa8, #8e35f0)", opacity: 0.5 }}
-              />
-
-              <h3
-                className="font-bold mb-3 leading-tight"
+              <SpotlightCard
+                spotlightColor={spotlightColor}
+                className={`relative h-full transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1 ${
+                  dark
+                    ? "hover:shadow-[0_16px_48px_rgba(128,39,224,0.30)]"
+                    : "hover:shadow-[0_16px_48px_rgba(128,39,224,0.45)]"
+                }`}
                 style={{
-                  fontFamily: "var(--font-clash)",
-                  fontSize: "clamp(15px, 1.5vw, 17px)",
-                  color: cardTitle,
-                  letterSpacing: "-0.01em",
+                  background: cardBg,
+                  borderColor: dark ? "rgba(128,39,224,0.14)" : "rgba(109,31,212,0.10)",
                 }}
               >
-                {r.title}
-              </h3>
+                {/* Top gradient bar */}
+                <div
+                  className="absolute top-0 left-0 right-0 h-[2px] rounded-t-3xl"
+                  style={{ background: "linear-gradient(90deg, #4a0fa8, #8e35f0)", opacity: 0.5 }}
+                />
 
-              <p
-                className="text-[13.5px] leading-[1.70] m-0"
-                style={{ color: textMuted, fontFamily: "system-ui, -apple-system, sans-serif" }}
-              >
-                {r.desc}
-              </p>
-            </SpotlightCard>
+                <span
+                  aria-hidden="true"
+                  className="inline-flex items-center justify-center w-9 h-9 rounded-xl mb-5 text-[12px] font-bold"
+                  style={{
+                    fontFamily: "var(--font-clash)",
+                    background: "rgba(255,255,255,0.10)",
+                    border: "1px solid rgba(255,255,255,0.14)",
+                    color: dark ? "#c8aaff" : "#ffffff",
+                  }}
+                >
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+
+                <h3
+                  className="font-bold mb-3 leading-tight"
+                  style={{
+                    fontSize: "clamp(17px, 1.6vw, 20px)",
+                    color: cardTitle,
+                    letterSpacing: "-0.01em",
+                  }}
+                >
+                  {r.title}
+                </h3>
+
+                <p
+                  className="text-[14px] leading-[1.70] m-0"
+                  style={{ color: textMuted }}
+                >
+                  {r.desc}
+                </p>
+              </SpotlightCard>
+            </div>
           ))}
         </div>
 
@@ -196,7 +199,6 @@ style={{
             <h3
               className="font-bold leading-[1.1] tracking-[-0.02em] m-0"
               style={{
-                fontFamily: "var(--font-clash)",
                 fontSize: "clamp(24px, 3vw, 40px)",
                 color: "#ffffff",
               }}
@@ -210,7 +212,7 @@ style={{
           <div className="relative z-10 flex-shrink-0">
             <p
               className="text-[15px] leading-[1.65] mb-6 max-w-[340px]"
-              style={{ color: "rgba(255,255,255,0.72)", fontFamily: "system-ui, -apple-system, sans-serif" }}
+              style={{ color: "rgba(255,255,255,0.72)" }}
             >
               Not because their product is bad, but because nobody knows they exist.
               That changes today.

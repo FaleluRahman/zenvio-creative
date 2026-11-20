@@ -1,6 +1,6 @@
 "use client";
 
-import { useTheme } from "next-themes";
+import { useIsDark } from "@/lib/use-is-dark";
 import { useEffect, useState, useRef } from "react";
 
 /* ─── Services Data ───────────────────────────────────────────── */
@@ -174,9 +174,7 @@ function useInView(threshold = 0.08) {
 }
 
 export default function Services() {
-  const { resolvedTheme } = useTheme();
-  const [dark, setDark] = useState(false);
-  useEffect(() => { setDark(resolvedTheme === "dark"); }, [resolvedTheme]);
+  const dark = useIsDark();
 
   const { ref, inView } = useInView();
   const [activeFilter, setActiveFilter] = useState("all");
@@ -205,7 +203,7 @@ export default function Services() {
       {/* Ambient Glow matching reference design */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] -z-10"
+        className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px]"
         style={{
           background: dark
             ? "radial-gradient(circle at 50% 10%, rgba(121, 40, 224, 0.22) 0%, rgba(10, 10, 12, 0) 70%)"
@@ -213,7 +211,7 @@ export default function Services() {
         }}
       />
 
-      <div ref={ref} className="w-full px-20 max-lg:px-12 max-md:px-6">
+      <div ref={ref} className="relative w-full max-w-[1440px] mx-auto px-20 max-lg:px-12 max-md:px-6">
         {/* Section Header */}
         <div
           className="text-center max-w-3xl mx-auto mb-12 md:mb-16"
@@ -241,7 +239,6 @@ export default function Services() {
           {/* Headline */}
           <h2
             className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.08] mb-6"
-            style={{ fontFamily: "var(--font-clash), sans-serif" }}
           >
             Engineered For Impact.<br className="hidden sm:block" />
             <span
@@ -279,6 +276,7 @@ export default function Services() {
               <button
                 key={tab.id}
                 type="button"
+                aria-pressed={isActive}
                 onClick={() => setActiveFilter(tab.id)}
                 className="px-5 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 cursor-pointer"
                 style={{
@@ -341,7 +339,6 @@ export default function Services() {
                 {/* Title */}
                 <h3
                   className="text-2xl font-bold text-white mb-3 tracking-tight"
-                  style={{ fontFamily: "var(--font-clash), sans-serif" }}
                 >
                   {svc.title}
                 </h3>
