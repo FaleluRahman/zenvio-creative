@@ -290,7 +290,7 @@ export default function Portfolio() {
 
         {/* Websites */}
         {filteredSites.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-7 mb-6 lg:mb-7">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-7 mb-6 lg:mb-7">
             {filteredSites.map((site, i) => (
               <a
                 key={site.id}
@@ -324,19 +324,19 @@ export default function Portfolio() {
                     src={site.image}
                     alt={`${site.title} website preview`}
                     fill
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
                     className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
                   />
                 </div>
 
-                <div className="p-7 md:p-8 flex flex-col flex-1">
+                <div className="p-7 md:p-8 xl:p-6 flex flex-col flex-1">
                   <div className="flex items-start justify-between gap-4 mb-3">
                     <div>
                       <span className="text-xs font-bold uppercase tracking-wider text-purple-200 bg-white/15 px-3 py-1 rounded-full">
                         {categoryLabel[site.category]}
                       </span>
                       <h3
-                        className="text-2xl font-bold mt-4 tracking-tight"
+                        className="text-2xl xl:text-xl font-bold mt-4 tracking-tight"
                       >
                         {site.title}
                       </h3>
