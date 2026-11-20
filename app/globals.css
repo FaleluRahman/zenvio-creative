@@ -206,3 +206,7 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Horizontal scrollers without a visible scrollbar (filter pills on mobile) */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }

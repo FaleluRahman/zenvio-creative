@@ -66,7 +66,7 @@ const websiteWorks: WebsiteWork[] = [
     client: "Sunni Students' Federation",
     url: "https://www.nationalssf.org",
     image: "/images/websites/ssf-india.png",
-    desc: "National platform for a million-member student movement — departments, news, events like Sahityotsav, and a map of units across India.",
+    desc: "National site for a million-member student movement.",
     tags: ["Organisation", "News & Events", "Unit Map"],
   },
   {
@@ -77,7 +77,7 @@ const websiteWorks: WebsiteWork[] = [
     client: "Console Rentals · Kerala",
     url: "https://www.lobbygamepartner.com",
     image: "/images/websites/lobby-gaming.png",
-    desc: "Rental storefront for PS5, PS4 & Xbox setups delivered to homes, hostels and events — with a 400+ game library showcase.",
+    desc: "Console rental storefront with a 400+ game library.",
     tags: ["Business", "Rental Booking", "Gaming"],
   },
   {
@@ -88,7 +88,7 @@ const websiteWorks: WebsiteWork[] = [
     client: "Dental Care · Kannur",
     url: "https://www.najathdentalclinic.com",
     image: "/images/websites/najath-dental.jpg",
-    desc: "Clinic website presenting general, cosmetic, orthodontic & implant treatments with online appointment booking.",
+    desc: "Clinic site with treatments and online booking.",
     tags: ["Healthcare", "Online Booking", "Local SEO"],
   },
   {
@@ -99,7 +99,7 @@ const websiteWorks: WebsiteWork[] = [
     client: "Civil Service Coaching · Thiruvananthapuram",
     url: "https://www.zaithoonacademy.in",
     image: "/images/websites/zaithoon-academy.png",
-    desc: "Free UPSC coaching initiative — programmes, mentorship, guest lectures from IAS/IPS officers and scholarship details.",
+    desc: "Free UPSC coaching, mentoring and scholarships.",
     tags: ["Education", "Admissions", "Scholarships"],
   },
 ];
@@ -252,7 +252,7 @@ export default function Portfolio() {
             className="text-base sm:text-lg font-normal leading-relaxed max-w-2xl mx-auto"
             style={{ color: descColor }}
           >
-            From websites that convert to packaging that sells off the shelf — a selection of recent projects across web, packaging, advertising and social media.
+            Recent work across web, packaging, ads and social media.
           </p>
         </div>
 

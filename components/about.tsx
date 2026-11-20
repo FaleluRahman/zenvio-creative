@@ -7,18 +7,18 @@ const stats = [
   {
     value: "100%",
     label: "Results-Driven",
-    desc: "Every move we make is backed by data and obsessed with outcomes — not just aesthetics.",
+    desc: "Every move backed by data, judged by outcomes.",
     backIcon: "📊",
     backTitle: "Data Over Assumptions",
-    backDesc: "We A/B test everything — ad copy, layouts, CTAs — until the numbers tell the truth. Gut feelings don't scale. Data does.",
+    backDesc: "We test copy, layouts and CTAs until the numbers speak.",
   },
   {
     value: "∞",
     label: "Creative Without Limits",
-    desc: "We never do templates. Every brand gets a strategy built from scratch, for them.",
+    desc: "No templates. Every strategy built from scratch.",
     backIcon: "💡",
     backTitle: "Built From Blank Pages",
-    backDesc: "Zero cookie-cutter decks. Every brief starts fresh and ends with something the market hasn't seen before.",
+    backDesc: "Every brief starts fresh and ends somewhere new.",
   },
 ];
 
@@ -161,9 +161,8 @@ export default function About() {
     : "linear-gradient(135deg, #0d0130 0%, #3b0f8a 50%, #6d1fd4 100%)";
 
   const paras = [
-    "You've seen brands blow up overnight and wondered — how?",
-    "It wasn't luck. It wasn't a bigger budget. It was the right team, at the right time, with the right moves.",
-    "Zenvio Creative is what happens when strategy gets obsessed with results — and creativity refuses to play it safe. We're built for brands that refuse to be ignored.",
+    "Brands don't blow up by luck. They blow up with the right team and the right moves.",
+    "Zenvio pairs results-obsessed strategy with creative that refuses to play safe.",
   ];
 
   return (

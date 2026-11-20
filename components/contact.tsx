@@ -121,7 +121,7 @@ export default function Contact() {
           </h2>
           <p className="text-[16px] leading-[1.65] max-w-[460px] mx-auto"
             style={{ color: textMuted }}>
-            Drop us a message. We respond fast — because good opportunities shouldn&apos;t wait.
+            Drop a message. We reply fast.
           </p>
         </div>
 
@@ -238,7 +238,7 @@ export default function Contact() {
                   id="contact-message"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Tell us about your brand, your goals, and what's holding you back..."
+                  placeholder="Your brand, your goals…"
                   rows={5}
                   className="w-full rounded-xl px-5 py-4 text-[14px] leading-[1.65] resize-none outline-none transition-all duration-250"
                   style={{
@@ -258,7 +258,7 @@ export default function Contact() {
               {/* Submit */}
               <div className="flex items-center justify-between flex-wrap gap-5">
                 <p className="text-[13px]" style={{ color: textMuted }}>
-                  No spam. No long waits. Just real conversations.
+                  No spam. Real replies.
                 </p>
                 <button
                   type="button"

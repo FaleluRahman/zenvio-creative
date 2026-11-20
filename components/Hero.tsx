@@ -247,21 +247,21 @@ const cardData = [
     label: "Brand Identity",
     stat: "3.2×",
     sub: "avg. recall lift",
-    desc: "We distill your brand into a mark that stops thumbs and earns loyalty.",
+    desc: "A mark that stops thumbs.",
     accent: "#6d1fd4",
   },
   {
     label: "Meta & Performance Ads",
     stat: "↓62%",
     sub: "cost per acquisition",
-    desc: "Data-first creative that converts — tested, iterated, scaled.",
+    desc: "Tested, iterated, scaled.",
     accent: "#4a0fa8",
   },
   {
     label: "Content Strategy",
     stat: "18M+",
     sub: "organic impressions",
-    desc: "Stories engineered to spread — from brief to viral loop.",
+    desc: "Stories built to spread.",
     accent: "#2d0880",
   },
 ];
@@ -410,7 +410,7 @@ export default function Hero() {
 
       {/* ── P tag: TextType (typing animation) ── */}
 <p
-  className="text-[17px] md:text-[19px] leading-[1.45] max-w-125 mb-8 min-h-[4.35em] md:min-h-[2.9em]"
+  className="text-[17px] md:text-[19px] leading-[1.45] max-w-125 mb-8 min-h-[2.9em] md:min-h-[1.45em]"
   style={{
     background: "linear-gradient(90deg, #580ca5, #8027e0)",
     WebkitBackgroundClip: "text",
@@ -420,9 +420,9 @@ export default function Hero() {
 >
   <TextType
     texts={[
-      "We don't just run campaigns. We build brands that are impossible to scroll past.",
-      "Impossible to forget, and impossible to compete with.",
-      "Data-first creative. Stories engineered to spread.",
+      "We build brands impossible to scroll past.",
+      "Impossible to forget. Hard to compete with.",
+      "Data-first creative that spreads.",
     ]}
     typingSpeed={38}
     deletingSpeed={22}

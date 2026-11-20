@@ -7,27 +7,27 @@ import SpotlightCard from "./reactbits/card";
 const reasons = [
   {
     title: "We Treat Your Brand Like Our Own",
-    desc: "No inbox-and-forget approach here. We're invested in your growth because your success is how we measure ours.",
+    desc: "Your growth is how we measure ours.",
   },
   {
     title: "Zero Cookie-Cutter Strategies",
-    desc: "Everything is built for you — from scratch. Your competitors get their own version. You get yours.",
+    desc: "Every plan built from scratch, for you.",
   },
   {
     title: "We Move Fast, Think Creatively",
-    desc: "Trends don't wait. Neither do we. We're always ahead of the curve so your brand never falls behind.",
+    desc: "Ahead of trends, so you never fall behind.",
   },
   {
     title: "Results, Not Just Vibes",
-    desc: "Pretty content that doesn't convert is just expensive decoration. We obsess over numbers that actually matter.",
+    desc: "We chase numbers that matter, not likes.",
   },
   {
     title: "Always In Your Corner",
-    desc: "One team, full transparency, no surprises. You'll always know what we're doing and why it's working.",
+    desc: "One team, full transparency, no surprises.",
   },
   {
     title: "Creative That Actually Sells",
-    desc: "We bridge the gap between art and commerce. Every idea is beautiful — and built to perform.",
+    desc: "Beautiful ideas, built to perform.",
   },
 ];
 
@@ -111,7 +111,7 @@ export default function WhyUs() {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-3 gap-5 mb-20 max-lg:grid-cols-2 max-md:grid-cols-1">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 mb-20 max-md:mb-14">
           {reasons.map((r, i) => (
             <div
               key={r.title}
@@ -123,7 +123,7 @@ export default function WhyUs() {
             >
               <SpotlightCard
                 spotlightColor={spotlightColor}
-                className={`relative h-full transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1 ${
+                className={`relative h-full max-sm:p-4 max-sm:rounded-2xl transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1 ${
                   dark
                     ? "hover:shadow-[0_16px_48px_rgba(128,39,224,0.30)]"
                     : "hover:shadow-[0_16px_48px_rgba(128,39,224,0.45)]"
@@ -141,7 +141,7 @@ export default function WhyUs() {
 
                 <span
                   aria-hidden="true"
-                  className="inline-flex items-center justify-center w-9 h-9 rounded-xl mb-5 text-[12px] font-bold"
+                  className="inline-flex items-center justify-center w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl mb-3 sm:mb-5 text-[10px] sm:text-[12px] font-bold"
                   style={{
                     fontFamily: "var(--font-clash)",
                     background: "rgba(255,255,255,0.10)",
@@ -153,9 +153,9 @@ export default function WhyUs() {
                 </span>
 
                 <h3
-                  className="font-bold mb-3 leading-tight"
+                  className="font-bold mb-2 sm:mb-3 leading-tight"
                   style={{
-                    fontSize: "clamp(17px, 1.6vw, 20px)",
+                    fontSize: "clamp(14px, 1.6vw, 20px)",
                     color: cardTitle,
                     letterSpacing: "-0.01em",
                   }}
@@ -164,7 +164,7 @@ export default function WhyUs() {
                 </h3>
 
                 <p
-                  className="text-[14px] leading-[1.70] m-0"
+                  className="text-[12px] sm:text-[14px] leading-[1.6] sm:leading-[1.70] m-0"
                   style={{ color: textMuted }}
                 >
                   {r.desc}
@@ -214,8 +214,7 @@ export default function WhyUs() {
               className="text-[15px] leading-[1.65] mb-6 max-w-[340px]"
               style={{ color: "rgba(255,255,255,0.72)" }}
             >
-              Not because their product is bad, but because nobody knows they exist.
-              That changes today.
+              Not from bad products — from being unseen. Let&apos;s fix that.
             </p>
             <a
               href="#contact"
