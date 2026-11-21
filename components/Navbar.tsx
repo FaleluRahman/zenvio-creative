@@ -2,21 +2,27 @@
 
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Sun, Moon, Menu, X } from "lucide-react";
 
+/* Home sections use "/#id" so they also work from other pages */
 const navLinks = [
-  { label: "Home", href: "#home" },
-  { label: "About", href: "#about" },
-  { label: "Services", href: "#services" },
-  { label: "Portfolio", href: "#portfolio" },
-  { label: "Contact", href: "#contact" },
+  { label: "Home", href: "/#home" },
+  { label: "About", href: "/#about" },
+  { label: "Services", href: "/#services" },
+  { label: "Portfolio", href: "/portfolio" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 export default function Navbar() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [active, setActive] = useState("Home");
+  const pathname = usePathname();
+  const [spyActive, setSpyActive] = useState("Home");
+  // Separate pages highlight their own link; the homepage uses scroll-spy
+  const active = navLinks.find((l) => l.href === pathname)?.label ?? spyActive;
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -29,24 +35,26 @@ export default function Navbar() {
     };
   }, []);
 
-  // Scroll-spy: highlight the link of the section currently in view
+  // Scroll-spy (homepage): highlight the link of the section currently in view
   useEffect(() => {
+    if (pathname !== "/") return;
     const sections = navLinks
-      .map((l) => document.querySelector<HTMLElement>(l.href))
+      .filter((l) => l.href.startsWith("/#"))
+      .map((l) => document.getElementById(l.href.slice(2)))
       .filter((el): el is HTMLElement => !!el);
     const obs = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           if (!e.isIntersecting) return;
-          const link = navLinks.find((l) => l.href === `#${e.target.id}`);
-          if (link) setActive(link.label);
+          const link = navLinks.find((l) => l.href === `/#${e.target.id}`);
+          if (link) setSpyActive(link.label);
         });
       },
       { rootMargin: "-45% 0px -50% 0px" }
     );
     sections.forEach((el) => obs.observe(el));
     return () => obs.disconnect();
-  }, []);
+  }, [pathname]);
 
   // Lock body scroll + close on Escape when menu is open
   useEffect(() => {
@@ -73,9 +81,9 @@ export default function Navbar() {
               : "w-full h-24 px-6 md:px-12 bg-transparent border-none"
           }`}
         >
-          <a
-            href="#home"
-            aria-label="Zenvio — back to top"
+          <Link
+            href="/#home"
+            aria-label="Zenvio — home"
             className="text-xl tracking-tight select-none flex items-center"
             style={{ fontFamily: "var(--font-vamos)" }}
           >
@@ -83,7 +91,7 @@ export default function Navbar() {
               Zenvio
             </span>
          
-          </a>
+          </Link>
 
           {/* Desktop nav */}
           <ul className="hidden md:flex items-center gap-8">
@@ -96,9 +104,9 @@ export default function Navbar() {
                       : "opacity-0 group-hover:opacity-60"
                   }`}
                 />
-                <a
+                <Link
                   href={link.href}
-                  onClick={() => setActive(link.label)}
+                  onClick={() => setSpyActive(link.label)}
                   aria-current={active === link.label ? "page" : undefined}
                   className={`text-sm font-semibold transition-colors ${
                     active === link.label
@@ -108,7 +116,7 @@ export default function Navbar() {
                   style={{ fontFamily: "var(--font-clash)" }}
                 >
                   {link.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
@@ -171,11 +179,11 @@ export default function Navbar() {
 
           {navLinks.map((link, i) => (
             
-            <a
+            <Link
               key={link.href}
               href={link.href}
               onClick={() => {
-                setActive(link.label);
+                setSpyActive(link.label);
                 setMenuOpen(false);
               }}
               className={`text-4xl font-bold transition-colors duration-200 ${
@@ -189,7 +197,7 @@ export default function Navbar() {
               }}
             >
               {link.label}
-            </a>
+            </Link>
           ))}
 
           {/* Theme toggle in mobile menu */}

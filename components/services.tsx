@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useIsDark } from "@/lib/use-is-dark";
 import { useEffect, useState, useRef } from "react";
 import {
@@ -287,6 +288,22 @@ export default function Services() {
               </div>
             </article>
           ))}
+        </div>
+
+        {/* Portfolio lives on its own page now */}
+        <div className="mt-10 sm:mt-14 flex justify-center">
+          <Link
+            href="/portfolio"
+            className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5"
+            style={{
+              fontFamily: "var(--font-clash), sans-serif",
+              background: "linear-gradient(90deg, #4a0fa8 0%, #7c22e8 100%)",
+              boxShadow: "0 4px 20px rgba(109,31,212,0.35)",
+            }}
+          >
+            See Our Work
+            <span aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+          </Link>
         </div>
       </div>
     </section>

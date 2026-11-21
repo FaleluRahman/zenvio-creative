@@ -4,8 +4,8 @@
  * Next.js App Router — auto-served at /sitemap.xml
  *
  * Inspection summary:
- *  - Single-page site: all content (Hero, About, Why Us, Contact) lives on `/`
- *  - No dynamic routes, no blog, no products
+ *  - Homepage `/` holds Hero, About, Why Us, Services, Contact
+ *  - `/portfolio` is a separate page with the work showcase
  *  - API routes: /api/chat — excluded (not a page)
  *  - Canonical URL: https://zenvio.com/ (matches layout.tsx alternates.canonical)
  *  - No noindex found on any route
@@ -39,7 +39,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       /**
-       * The homepage — the only indexable URL on this site.
+       * The homepage.
        * All sections (About, Services, Why Us, Contact) are anchor-scrolled
        * sections on this single page. Canonical: https://zenvio.com/
        */
@@ -47,6 +47,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: SITE_LAST_UPDATED,
       changeFrequency: "monthly",
       priority: 1.0,
+    },
+    {
+      url: `${BASE_URL}/portfolio`,
+      lastModified: SITE_LAST_UPDATED,
+      changeFrequency: "monthly",
+      priority: 0.8,
     },
   ];
 }

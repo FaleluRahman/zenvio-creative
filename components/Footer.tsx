@@ -1,14 +1,16 @@
 "use client";
 
+import Link from "next/link";
+
 import { useIsDark } from "@/lib/use-is-dark";
 
 const navLinks = [
-  { label: "Home",     href: "#home" },
-  { label: "About",   href: "#about" },
-  { label: "Why Us",   href: "#why" },
-  { label: "Services", href: "#services" },
-  { label: "Portfolio", href: "#portfolio" },
-  { label: "Contact",  href: "#contact" },
+  { label: "Home",     href: "/#home" },
+  { label: "About",   href: "/#about" },
+  { label: "Why Us",   href: "/#why" },
+  { label: "Services", href: "/#services" },
+  { label: "Portfolio", href: "/portfolio" },
+  { label: "Contact",  href: "/#contact" },
 ];
 
 const socials = [
@@ -62,7 +64,7 @@ export default function Footer() {
         }}
       >
         {/* Logo */}
-        <a href="#home" aria-label="Zenvio — back to top" style={{ textDecoration: "none", flexShrink: 0 }}>
+        <Link href="/#home" aria-label="Zenvio — home" style={{ textDecoration: "none", flexShrink: 0 }}>
           <span
             style={{
               fontFamily: "var(--font-vamos, var(--font-clash))",
@@ -75,12 +77,12 @@ export default function Footer() {
           >
             Zenvio
           </span>
-        </a>
+        </Link>
 
         {/* Nav links — hidden on mobile */}
         <nav className="hidden md:flex items-center gap-7" aria-label="Footer navigation">
           {navLinks.map((l) => (
-            <a
+            <Link
               key={l.href}
               href={l.href}
               style={{
@@ -93,7 +95,7 @@ export default function Footer() {
               onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = textMuted; }}
             >
               {l.label}
-            </a>
+            </Link>
           ))}
         </nav>
 

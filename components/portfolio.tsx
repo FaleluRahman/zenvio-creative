@@ -141,7 +141,9 @@ function useInView(threshold = 0.08) {
 const hostOf = (url: string) => new URL(url).hostname.replace(/^www\./, "");
 
 /* ─── Component ──────────────────────────────────────────────── */
-export default function Portfolio() {
+export default function Portfolio({ asPage = false }: { asPage?: boolean }) {
+  // On /portfolio the title is the page h1; leave room for the fixed navbar
+  const Heading = asPage ? "h1" : "h2";
   const dark = useIsDark();
 
   const { ref, inView } = useInView();
@@ -195,7 +197,7 @@ export default function Portfolio() {
   return (
     <section
       id="portfolio"
-      className="relative w-full py-24 max-md:py-16 overflow-hidden"
+      className={`relative w-full overflow-hidden ${asPage ? "pt-36 pb-24 max-md:pt-28 max-md:pb-16 min-h-svh" : "py-24 max-md:py-16"}`}
       style={{ backgroundColor: sectionBg, color: titleColor }}
     >
       <div
@@ -232,7 +234,7 @@ export default function Portfolio() {
             </span>
           </div>
 
-          <h2
+          <Heading
             className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.08] mb-6"
           >
             Work That Speaks.<br className="hidden sm:block" />
@@ -246,7 +248,7 @@ export default function Portfolio() {
             >
               Brands We&apos;ve Built.
             </span>
-          </h2>
+          </Heading>
 
           <p
             className="text-base sm:text-lg font-normal leading-relaxed max-w-2xl mx-auto"
